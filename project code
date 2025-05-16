@@ -1,0 +1,144 @@
+abstract class Product {
+    private String name;
+    private double price;
+    private String category;
+
+    public Product(String name, double price, String category) {
+        this.name = name;
+        this.price = price;
+        this.category = category;
+    }
+
+    public abstract double calculateDiscount();
+
+    public String getName() { return name; }
+    public double getPrice() { return price; }
+    public String getCategory() { return category; }
+    
+    public double getFinalPrice() { return price * (1 - calculateDiscount()); }
+
+    public String toString() {
+        return name + " - $" + getFinalPrice();
+    }
+}
+
+class Electronics extends Product {
+    private int warranty;
+
+    public Electronics(String name, double price, int warranty) {
+        super(name, price, "Electronics");
+        this.warranty = warranty;
+    }
+
+    public double calculateDiscount() { return warranty > 12 ? 0.05 : 0.02; }
+}
+
+class Clothing extends Product {
+    public Clothing(String name, double price) {
+        super(name, price, "Clothing");
+    }
+
+    public double calculateDiscount() { return 0.10; }
+}
+
+class Grocery extends Product {
+    private boolean organic;
+
+    public Grocery(String name, double price, boolean organic) {
+        super(name, price, "Grocery");
+        this.organic = organic;
+    }
+
+    public double calculateDiscount() { return organic ? 0.05 : 0.08; }
+}
+
+class Cart {
+    private Product[] items = new Product[10];
+    private int count = 0;
+    
+    public void add(Product p) {
+        if (count < items.length) {
+            items[count++] = p;
+        }
+    }
+    
+    public double getTotal() {
+        double total = 0;
+        for (int i = 0; i < count; i++) {
+            total += items[i].getFinalPrice();
+        }
+        return total;
+    }
+}
+
+public class MicroECommerce {
+    private Product[] products = new Product[10];
+    private int productCount = 0;
+    
+    public void addProduct(Product p) {
+        if (productCount < products.length) {
+            products[productCount++] = p;
+        }
+    }
+    
+    public Product[] searchProducts(String query) {
+        Product[] results = new Product[productCount];
+        int resultCount = 0;
+        
+        for (int i = 0; i < productCount; i++) {
+            if (products[i].getName().toLowerCase().contains(query.toLowerCase())) {
+                results[resultCount++] = products[i];
+            }
+        }
+        
+        Product[] finalResults = new Product[resultCount];
+        for (int i = 0; i < resultCount; i++) {
+            finalResults[i] = results[i];
+        }
+        return finalResults;
+    }
+    
+    public Product[] filterExpensiveProducts(double threshold) {
+        Product[] results = new Product[productCount];
+        int resultCount = 0;
+        
+        for (int i = 0; i < productCount; i++) {
+            if (products[i].getPrice() > threshold) {
+                results[resultCount++] = products[i];
+            }
+        }
+        
+        Product[] finalResults = new Product[resultCount];
+        for (int i = 0; i < resultCount; i++) {
+            finalResults[i] = results[i];
+        }
+        return finalResults;
+    }
+    
+    public static void main(String[] args) {
+        MicroECommerce store = new MicroECommerce();
+        
+        store.addProduct(new Electronics("Smartphone", 599.99, 24));
+        store.addProduct(new Clothing("T-Shirt", 19.99));
+        store.addProduct(new Grocery("Apples", 3.99, true));
+        
+        System.out.println("Search results:");
+        Product[] phones = store.searchProducts("phone");
+        for (Product p : phones) {
+            System.out.println(p);
+        }
+        
+        System.out.println("\nExpensive items:");
+        Product[] expensive = store.filterExpensiveProducts(100);
+        for (Product p : expensive) {
+            System.out.println(p);
+        }
+        
+        Cart cart = new Cart();
+        cart.add(phones[0]);
+        cart.add(store.searchProducts("shirt")[0]);
+        
+        System.out.println("\nCart total: $" + cart.getTotal());
+        System.out.println("Checkout complete!");
+    }
+}
